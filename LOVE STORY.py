@@ -145,3 +145,28 @@ with tab2:
 
 with tab3:
     st.dataframe(df.sort_index(ascending=False), use_container_width=True)
+    # --- 🐞 调试专区 (测试完可以删掉) ---
+st.divider()
+st.header("🔧 微信推送测试")
+if st.button("点我测试发送一条消息"):
+    test_url = "https://wxpusher.zjiecode.com/api/send/message"
+    test_body = {
+        "appToken": WX_APP_TOKEN,
+        "content": "这是一条测试消息，看到我说明配置成功了！",
+        "contentType": 1, 
+        "uids": TARGET_UIDS
+    }
+    try:
+        res = requests.post(test_url, json=test_body)
+        res_json = res.json()
+        
+        # 直接把结果显示在网页上
+        if res_json['code'] == 1000:
+            st.success("✅ 发送成功！快看微信！")
+            st.json(res_json)
+        else:
+            st.error("❌ 发送失败！请把下面的报错截图发给我：")
+            st.json(res_json) # 这里会显示具体的错误原因
+    except Exception as e:
+        st.error(f"❌ 代码运行报错: {e}")
+
