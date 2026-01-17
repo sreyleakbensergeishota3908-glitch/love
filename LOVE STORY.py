@@ -17,18 +17,35 @@ st.set_page_config(page_title="上岸养成计划", page_icon="🎓", layout="ce
 
 # --- 🛠️ 核心功能函数 ---
 # 我们使用 st.cache_resource 保持连接，避免重复请求
+# --- 🛠️ 核心功能函数 (修复版) ---
 @st.cache_resource
 def get_connection():
-    # 这里需要读取 Streamlit Secrets 里的配置
-    # 具体怎么配，看教程第三阶段
+    # 检查是否配置了 Secrets
     if "gcp_service_account" in st.secrets:
-        scope = ['love-shot@love-study-app.iam.gserviceaccount.com']
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(st.secrets["gcp_service_account"]), scope)
-        client = gspread.authorize(creds)
-        # 打开表格：你需要把表格名称填在 secrets 或者这里
-        sheet = client.open("LoveBank").sheet1 
-        return sheet
+        try:
+            scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+            
+            # 1. 从 Secrets 读取配置，并转为普通字典
+            creds_dict = dict(st.secrets["gcp_service_account"])
+            
+            # 2. 🩹【关键修复】手动修复私钥格式
+            # 这一步会自动把字符串里的 "\\n" 变成真正的换行，防止格式报错
+            if "private_key" in creds_dict:
+                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+            
+            # 3. 创建凭证
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            client = gspread.authorize(creds)
+            
+            # 4. 打开表格 (确保你的 Google Sheet 名字叫 LoveBank)
+            sheet = client.open("LoveBank").sheet1 
+            return sheet
+            
+        except Exception as e:
+            st.error(f"连接数据库失败，请检查 Secrets 配置: {e}")
+            return None
     else:
+        st.warning("未检测到 Secrets 配置，请在 Streamlit 后台设置。")
         return None
 
 def load_data():
@@ -104,3 +121,4 @@ with tab2:
 with tab3:
 
     st.dataframe(df)
+
