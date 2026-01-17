@@ -128,7 +128,7 @@ def send_wechat_msg(content):
         "appToken": "你的_APP_TOKEN",
         "content": content,
         "contentType": 1,
-        "uids": ["你的UID", "她的UID"]
+        "uids": ["UID_I6L6ANL0Il86r4JDYIOaezEEEcdR", "UID_hVfLqv8hvIjtfcKUsM5ViXhDR3xN"]
     }
     try:
         requests.post(url, json=body)
@@ -143,6 +143,7 @@ if st.button(f"{task_name} (+{points})"):
     st.balloons()
 
     st.dataframe(df)
+
 
 
 
