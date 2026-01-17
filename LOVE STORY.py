@@ -119,7 +119,30 @@ with tab2:
                 st.error("积分不足")
 
 with tab3:
+    import requests
+
+def send_wechat_msg(content):
+    # 这是 WXPusher 的接口
+    url = "https://wxpusher.zjiecode.com/api/send/message"
+    body = {
+        "appToken": "你的_APP_TOKEN",
+        "content": content,
+        "contentType": 1,
+        "uids": ["你的UID", "她的UID"]
+    }
+    try:
+        requests.post(url, json=body)
+    except:
+        pass # 发送失败也不影响主程序运行
+
+# --- 在打卡成功的地方调用 ---
+if st.button(f"{task_name} (+{points})"):
+    save_record("收入", task_name, points)
+    # 👇 加这一行
+    send_wechat_msg(f"🎉 宝贝刚刚完成了：{task_name}，积分 +{points}！当前总分：{new_total}")
+    st.balloons()
 
     st.dataframe(df)
+
 
 
