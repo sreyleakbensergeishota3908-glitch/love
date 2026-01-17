@@ -22,7 +22,7 @@ def get_connection():
     # 这里需要读取 Streamlit Secrets 里的配置
     # 具体怎么配，看教程第三阶段
     if "gcp_service_account" in st.secrets:
-        scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+        scope = ['love-shot@love-study-app.iam.gserviceaccount.com']
         creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(st.secrets["gcp_service_account"]), scope)
         client = gspread.authorize(creds)
         # 打开表格：你需要把表格名称填在 secrets 或者这里
@@ -102,4 +102,5 @@ with tab2:
                 st.error("积分不足")
 
 with tab3:
+
     st.dataframe(df)
